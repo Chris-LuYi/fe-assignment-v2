@@ -1,39 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
-import { apiFetch } from './api/client'
-import type { Health } from './api/types'
+import { customerQuery } from './api/queries'
+import { Header } from './components/Header'
+import { Dashboard } from './features/dashboard/Dashboard'
+import { DebugMenu } from './features/debug/DebugMenu'
+import { useSegment, useTheme } from './features/preferences/usePreferences'
 
 export default function App() {
-  const health = useQuery({
-    queryKey: ['health'],
-    queryFn: () => apiFetch<Health>('/api/health'),
-    retry: false,
-  })
-
-  const status = health.isPending
-    ? 'checking…'
-    : health.isError
-      ? 'not connected'
-      : 'connected'
+  const { data: customer } = useQuery(customerQuery)
+  const { theme, toggleTheme } = useTheme()
+  const { segment, changeSegment } = useSegment()
+  const initials = customer ? `${customer.firstName[0]}${customer.lastName[0]}` : undefined
 
   return (
-    <div className="starter">
-      <header className="starter-header">
-        <strong>Meridian</strong>
-        <span>Take-home starter</span>
-      </header>
-
-      <main className="starter-main">
-        <h1>Build the dashboard and transfer flow</h1>
-        <p>
-          Start with <code>README.md</code>, then read{' '}
-          <code>brief/candidate-brief.md</code>. Replace this screen with your
-          app.
-        </p>
-
-        <p className="status" role="status">
-          Mock API: {status}
-        </p>
+    <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <Header
+        initials={initials}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        segment={segment}
+        onSegmentChange={changeSegment}
+      />
+      <main id="main" className="container page">
+        <Dashboard segment={segment} onSegmentChange={changeSegment} />
       </main>
-    </div>
+      <DebugMenu />
+    </>
   )
 }
