@@ -2,9 +2,33 @@
 <html lang="en" data-theme="light" data-segment="retail">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f4f6fa" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Meridian Banking</title>
+    <!--
+      TH1/TH2: apply the saved theme and segment before first paint so a reload
+      never flashes the wrong theme. Keep the storage keys in sync with
+      src/features/preferences/preferences.ts.
+    -->
+    <script>
+      ;(function () {
+        var root = document.documentElement
+        try {
+          var theme = localStorage.getItem('meridian:theme')
+          var segment = localStorage.getItem('meridian:segment')
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+          }
+          root.setAttribute('data-theme', theme)
+          if (segment === 'retail' || segment === 'premium') {
+            root.setAttribute('data-segment', segment)
+          }
+        } catch (e) {
+          // Storage blocked (private mode etc.): keep the defaults.
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
